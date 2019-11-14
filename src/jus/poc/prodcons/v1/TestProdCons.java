@@ -19,6 +19,10 @@ public class TestProdCons {
 		int consTime = Integer.parseInt(properties.getProperty("consTime"));
 		int minProd = Integer.parseInt(properties.getProperty("minProd"));
 		int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
+		
+		ProdConsBuffer buffer = new ProdConsBuffer();
+		
+		
 	}
 
 }
