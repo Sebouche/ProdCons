@@ -2,10 +2,15 @@ package jus.poc.prodcons.v1;
 
 public class ProdConsBuffer implements IProdConsBuffer {
 
-	int buffer_size = 10;
-
-	Message[] Buffer = new Message[buffer_size];
+	int buffer_size;
+	Message[] Buffer;
+	
 	int index_buff = 0;
+	
+	public ProdConsBuffer(int size) {
+		buffer_size = size;
+		Buffer = new Message[buffer_size];
+	}
 
 	@Override
 	public void put(Message m) throws InterruptedException {
