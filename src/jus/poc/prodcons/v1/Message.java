@@ -3,7 +3,7 @@ package jus.poc.prodcons.v1;
 public class Message {
 	String s;
 	
-	public void message(String s) {
+	public Message(String s) {
 		this.s=s;
 	}
 	
@@ -11,5 +11,7 @@ public class Message {
 		return s.length();
 	}
 	
-	
+	public String content() {
+		return s;
+	}
 }
