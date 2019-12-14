@@ -8,13 +8,15 @@ public class Consumer extends Thread {
 	long id;
 
 	ProdConsBuffer buffer;
+	Watcher w;
 	
 	Random rand = new Random();
 
-	public Consumer(int consTime, ProdConsBuffer buf) {
+	public Consumer(int consTime, ProdConsBuffer buf, Watcher w) {
 		this.consTime = consTime;
 		id = getId();
 		buffer = buf;
+		this.w = w;
 	}
 
 	public Message cons() {
@@ -35,7 +37,7 @@ public class Consumer extends Thread {
 
 	public void run() {
 		System.out.println("Consumer thread " + id + " started");
-		while (true) {
+		while (!w.endProd()) {
 			System.out.println(" Consumer thread " + id + ": read " + cons().content());
 		}
 	}

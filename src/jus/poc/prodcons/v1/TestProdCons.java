@@ -22,9 +22,13 @@ public class TestProdCons {
 		int minProd = Integer.parseInt(properties.getProperty("minProd"));
 		int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
 
-		// on crée le buffer
-		ProdConsBuffer buffer = new ProdConsBuffer(bufSz);
+		// un watcher, qui permettra aux consommateur de savoir quand la production est
+				// finie
+				Watcher watcher = new Watcher();
 		
+		// on crée le buffer
+		ProdConsBuffer buffer = new ProdConsBuffer(bufSz, watcher);
+
 		// et nos producteur / consommateur
 		int i;
 		Producer[] p = new Producer[nProd];
@@ -32,9 +36,11 @@ public class TestProdCons {
 			p[i] = new Producer(minProd, maxProd, prodTime, buffer);
 		}
 
+		watcher.setWatch(p);
+
 		Consumer[] c = new Consumer[nCons];
 		for (i = 0; i < nCons; i++) {
-			c[i] = new Consumer(consTime, buffer);
+			c[i] = new Consumer(consTime, buffer, watcher);
 		}
 
 		// on les démarre dans un ordre aléatoire
@@ -52,6 +58,9 @@ public class TestProdCons {
 				nConsStarted++;
 			}
 		}
+		
+		watcher.start();
+		
 	}
 
 }
