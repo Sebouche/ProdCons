@@ -43,10 +43,8 @@ public class ProdConsBuffer implements IProdConsBuffer {
 				} catch (InterruptedException e) {
 				}
 			}
-			// si la production est terminée, on réveille tous les threads (qui ne sont plus
-			// que des consommateurs) pour qu'ils puissent finir leur exécution
+			// si la production est terminée, on envoie le message de fin
 			if (w.endProd()) {
-				notifyAll();
 				return new Message("End");
 			}
 			m = Buffer[index_cons % buffer_size];

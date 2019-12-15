@@ -23,9 +23,9 @@ public class TestProdCons {
 		int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
 
 		// un watcher, qui permettra aux consommateur de savoir quand la production est
-				// finie
-				Watcher watcher = new Watcher();
-		
+		// finie
+		Watcher watcher = new Watcher();
+
 		// on crée le buffer
 		ProdConsBuffer buffer = new ProdConsBuffer(bufSz, watcher);
 
@@ -37,6 +37,7 @@ public class TestProdCons {
 		}
 
 		watcher.setWatch(p);
+		watcher.setBuffer(buffer);
 
 		Consumer[] c = new Consumer[nCons];
 		for (i = 0; i < nCons; i++) {
@@ -58,9 +59,9 @@ public class TestProdCons {
 				nConsStarted++;
 			}
 		}
-		
+
 		watcher.start();
-		
+
 	}
 
 }
