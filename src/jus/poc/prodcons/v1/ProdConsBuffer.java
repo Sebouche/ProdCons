@@ -17,7 +17,7 @@ public class ProdConsBuffer implements IProdConsBuffer {
 	}
 
 	@Override
-	public void put(Message m) {
+	public void put(Message m) throws InterruptedException {
 		synchronized (this) {
 			while (nbMes >= buffer_size) {
 				try {
@@ -33,7 +33,7 @@ public class ProdConsBuffer implements IProdConsBuffer {
 	}
 
 	@Override
-	public Message get() {
+	public Message get() throws InterruptedException {
 		synchronized (this) {
 			Message m;
 			// on vérifie si le buffer est vide et si la production est terminée
@@ -44,7 +44,7 @@ public class ProdConsBuffer implements IProdConsBuffer {
 				}
 			}
 			// si la production est terminée, on envoie le message de fin
-			if (w.endProd()) {
+			if (w.endProd() && nbMes == 0) {
 				return new Message("End");
 			}
 			m = Buffer[index_cons % buffer_size];

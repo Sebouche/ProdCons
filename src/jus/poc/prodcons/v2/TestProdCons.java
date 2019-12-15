@@ -1,4 +1,4 @@
-package jus.poc.prodcons.v1;
+package jus.poc.prodcons.v2;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -62,7 +62,7 @@ public class TestProdCons {
 		}
 
 		watcher.start();
-		
+
 		// on attend la fin des consommateurs
 		for (i = 0; i < c.length; i++) {
 			try {
@@ -70,9 +70,9 @@ public class TestProdCons {
 			} catch (InterruptedException e) {
 			}
 		}
-		
+
 		long end = System.currentTimeMillis();
-		System.out.println("Efficiency: " + (float)buffer.totmsg()/(end - beg) + " messages per millisecond");
+		System.out.println("Efficiency: " + (float) buffer.totmsg() / (end - beg) + " messages per millisecond");
 
 	}
 

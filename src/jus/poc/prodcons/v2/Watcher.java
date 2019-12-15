@@ -1,9 +1,9 @@
-package jus.poc.prodcons.v1;
+package jus.poc.prodcons.v2;
 
 public class Watcher extends Thread {
 	Producer[] p;
 	ProdConsBuffer buffer;
-	
+
 	boolean endProd = false;
 
 	public boolean endProd() {
@@ -13,7 +13,7 @@ public class Watcher extends Thread {
 	public void setWatch(Producer[] p) {
 		this.p = p;
 	}
-	
+
 	public void setBuffer(ProdConsBuffer buf) {
 		buffer = buf;
 	}
@@ -29,17 +29,13 @@ public class Watcher extends Thread {
 				e.printStackTrace();
 			}
 		}
-		
-		synchronized (buffer) {
-			while (buffer.nmsg() > 0) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-				}
-			}
-			endProd = true;
-			buffer.notifyAll();
-		}
+
+		// on se bloque jusqu'à ce que le buffer soit vide. Comme tous les producteurs
+		// sont arrêtés à ce moment là, cela signifie qu'il faut arrêter les consommateurs
+		buffer.notFull.acquireUninterruptibly(buffer.buffer_size);
+
+		endProd = true;
+		buffer.notEmpty.release();
 	}
 
 }
