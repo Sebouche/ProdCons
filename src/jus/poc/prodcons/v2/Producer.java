@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Producer extends Thread {
 	int nbMessage = 0;
-	int nbMessageMin, nbMessageMax, prodTime;
+	int nbMessageMin, nbMessageMax, prodTime, prodTimeVariation;
 
 	long id;
 
@@ -12,10 +12,11 @@ public class Producer extends Thread {
 
 	Random rand = new Random();
 
-	public Producer(int nbMessageMin, int nbMessageMax, int prodTime, ProdConsBuffer buf) {
+	public Producer(int nbMessageMin, int nbMessageMax, int prodTime, int prodTimeVariation, ProdConsBuffer buf) {
 		this.nbMessageMin = nbMessageMin;
 		this.nbMessageMax = nbMessageMax;
 		this.prodTime = prodTime;
+		this.prodTimeVariation = prodTimeVariation;
 		id = getId();
 		buffer = buf;
 	}
@@ -24,12 +25,12 @@ public class Producer extends Thread {
 		nbMessage++;
 
 		// on crée un temps de production aléatoire de moyenne prodTime et compris entre
-		// prodTime - prodTime/2 et prodTime + prodTime/2 (le /2 est arbitraire)
+		// prodTime - prodTimeVariation et prodTime + prodTimeVariation
 		int diff;
 		if (rand.nextBoolean()) {
-			diff = (-rand.nextInt(prodTime / 2));
+			diff = (-rand.nextInt(prodTimeVariation));
 		} else {
-			diff = rand.nextInt(prodTime / 2);
+			diff = rand.nextInt(prodTimeVariation);
 		}
 		long beginProd = System.currentTimeMillis();
 		while (beginProd > System.currentTimeMillis() - prodTime + diff)
@@ -49,5 +50,12 @@ public class Producer extends Thread {
 		for (i = 0; i < nbMes; i++) {
 			prod("Producer thread " + id + ": message nb " + (nbMessage + 1));
 		}
+		
+		buffer.mutexIn.acquireUninterruptibly();
+		buffer.nbProd--;
+		if (buffer.nbProd == 0) {
+			buffer.notEmpty.release(buffer.buffer_size);
+		}
+		buffer.mutexIn.release();
 	}
 }

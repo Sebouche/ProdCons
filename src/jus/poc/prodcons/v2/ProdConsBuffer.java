@@ -9,17 +9,16 @@ public class ProdConsBuffer implements IProdConsBuffer {
 	int index_prod = 0;
 	int index_cons = 0;
 	int nbMes = 0;
-
-	Watcher w;
+	int nbProd;
 
 	Semaphore notFull;
 	Semaphore notEmpty;
 	Semaphore mutexIn, mutexOut;
 
-	public ProdConsBuffer(int buffer_size, Watcher w) {
+	public ProdConsBuffer(int buffer_size, int nbProd) {
 		this.buffer_size = buffer_size;
 		Buffer = new Message[buffer_size];
-		this.w = w;
+		this.nbProd = nbProd;
 		notFull = new Semaphore(buffer_size);
 		notEmpty = new Semaphore(0);
 		mutexIn = new Semaphore(1);
@@ -49,7 +48,7 @@ public class ProdConsBuffer implements IProdConsBuffer {
 
 		// si la production est terminée, on envoie le message de fin et on laisse
 		// passer un autre thread (consommateur) pour qu'il puisse se finir à son tour
-		if (w.endProd() && nbMes == 0) {
+		if (nbProd == 0 && nbMes == 0) {
 			notEmpty.release();
 			return new Message("End");
 		}
