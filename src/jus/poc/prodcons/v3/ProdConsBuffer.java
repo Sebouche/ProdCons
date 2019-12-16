@@ -1,4 +1,6 @@
-package jus.poc.prodcons.v1;
+package jus.poc.prodcons.v3;
+
+import java.util.concurrent.Semaphore;
 
 public class ProdConsBuffer implements IProdConsBuffer {
 
@@ -8,6 +10,8 @@ public class ProdConsBuffer implements IProdConsBuffer {
 	int index_cons = 0;
 	int nbMes = 0;
 	int nbProd;
+	
+	Semaphore consecutive = new Semaphore(1);
 
 	public ProdConsBuffer(int buffer_size, int nbProd) {
 		this.buffer_size = buffer_size;
@@ -53,6 +57,42 @@ public class ProdConsBuffer implements IProdConsBuffer {
 		}
 		return m;
 	}
+	
+	@Override
+	public Message[] getn(int n) {
+		Message[] m = new Message[n];
+		int i = 0;
+		
+		try {
+			consecutive.acquire();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		synchronized (this) {
+			while (i < n) {
+				// on vérifie si le buffer est vide et si la production est terminée
+				while (nbMes == 0 && nbProd > 0) {
+					try {
+						wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				
+				// si la production est terminée, on remplit de message de fin
+				if (nbProd == 0 && nbMes == 0) {
+					m[i] = new Message("End");
+				} else {
+					m[i] = Buffer[index_cons % buffer_size];
+					index_cons++;
+					nbMes--;
+				}
+				i++;
+			}
+		}
+		consecutive.release();
+		
+		return m;
+	}
 
 	@Override
 	public int nmsg() {
@@ -63,4 +103,5 @@ public class ProdConsBuffer implements IProdConsBuffer {
 	public int totmsg() {
 		return index_prod;
 	}
+	
 }

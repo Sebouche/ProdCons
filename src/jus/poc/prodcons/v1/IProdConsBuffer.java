@@ -6,13 +6,13 @@ public interface IProdConsBuffer {
 * Put the message m in the prodcons buffer
 **/
 
-	public void put(Message m) throws InterruptedException;
+	public void put(Message m);
 
 /**
 * Retrieve a message from the prodcons buffer, following a fifo order
 **/
 
-	public Message get() throws InterruptedException;
+	public Message get();
 
 
 /**
