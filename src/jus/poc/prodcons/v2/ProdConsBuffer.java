@@ -46,18 +46,17 @@ public class ProdConsBuffer implements IProdConsBuffer {
 		// on vérifie si le buffer est vide
 		notEmpty.acquire();
 
-		// si la production est terminée, on envoie le message de fin et on laisse
-		// passer un autre thread (consommateur) pour qu'il puisse se finir à son tour
-		if (nbProd == 0 && nbMes == 0) {
-			notEmpty.release();
-			return new Message("End");
-		}
-
 		// traitement exclusif du buffer
 		mutexOut.acquire();
-		m = Buffer[index_cons % buffer_size];
-		index_cons++;
-		nbMes--;
+		// si la production est terminée, on envoie le message de fin et on laisse
+		// passer un autre thread (consommateur) pour qu'il puisse se finir à son tour
+		if (nbProd == 0 && nbMes <= 0) {
+			m = new Message("End");
+		} else {
+			m = Buffer[index_cons % buffer_size];
+			index_cons++;
+			nbMes--;
+		}
 		mutexOut.release();
 
 		notFull.release();

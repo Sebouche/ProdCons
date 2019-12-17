@@ -3,23 +3,27 @@ package jus.poc.prodcons.v4;
 import java.util.Random;
 
 public class Consumer extends Thread {
+	boolean print;
+
 	int consTime, consTimeVariation;
 
 	long id;
 
 	ProdConsBuffer buffer;
-	
+
 	Random rand = new Random();
 
-	public Consumer(int consTime, int consTimeVariation, ProdConsBuffer buf) {
+	public Consumer(int consTime, int consTimeVariation, ProdConsBuffer buf, boolean print) {
 		this.consTime = consTime;
 		this.consTimeVariation = consTimeVariation;
 		id = getId();
 		buffer = buf;
+		this.print = print;
 	}
 
 	public Message cons() {
-		// on crée un temps de consommation aléatoire de moyenne consTime et compris entre
+		// on crée un temps de consommation aléatoire de moyenne consTime et compris
+		// entre
 		// consTime - consTimeVariation et consTime + consTimeVariation
 		int diff;
 		if (rand.nextBoolean()) {
@@ -33,9 +37,10 @@ public class Consumer extends Thread {
 
 		return buffer.get();
 	}
-	
+
 	public Message[] consn(int n) {
-		// on crée un temps de consommation aléatoire de moyenne consTime et compris entre
+		// on crée un temps de consommation aléatoire de moyenne consTime et compris
+		// entre
 		// consTime - consTimeVariation et consTime + consTimeVariation
 		int diff;
 		if (rand.nextBoolean()) {
@@ -51,15 +56,18 @@ public class Consumer extends Thread {
 	}
 
 	public void run() {
-		System.out.println("Consumer thread " + id + " started");
+		if (print)
+			System.out.println("Consumer thread " + id + " started");
+		Message[] res;
+		int i, n;
 		while (buffer.nbProd > 0 || buffer.nmsg() > 0) {
-			int n = 3;
-			int i;
-			Message[] res = consn(n);
+			n = 3;
+			res = consn(n);
 			for (i = 0; i < n; i++) {
-				System.out.println(" Consumer thread " + id + ": read " + res[i].content());
+				if (print)
+					System.out.println(" Consumer thread " + id + ": read " + res[i].content());
 			}
-			
+
 		}
 	}
 

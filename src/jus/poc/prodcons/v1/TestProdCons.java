@@ -23,65 +23,82 @@ public class TestProdCons {
 		int consTimeVariation = Integer.parseInt(properties.getProperty("consTimeVariation"));
 		int minProd = Integer.parseInt(properties.getProperty("minProd"));
 		int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
-		
+
 		if (prodTime < prodTimeVariation) {
 			System.out.println("prodTimeVariation too great");
-			prodTimeVariation = prodTime/2;
+			prodTimeVariation = prodTime / 2;
 		}
 		if (prodTimeVariation <= 0) {
 			prodTimeVariation = 1;
 		}
 		if (consTime < consTimeVariation) {
 			System.out.println("consTimeVariation too great");
-			consTimeVariation = consTime/2;
+			consTimeVariation = consTime / 2;
 		}
 		if (consTimeVariation <= 0) {
 			consTimeVariation = 1;
 		}
 
-		// on crée le buffer
-		ProdConsBuffer buffer = new ProdConsBuffer(bufSz, nProd);
+		boolean print, n;
+		int nbTimes, maxNbTimes, i, nProdStarted, nConsStarted;
+		long beg, end;
+		float eff, sumEff;
 
-		// et nos producteur / consommateur
-		int i;
-		Producer[] p = new Producer[nProd];
-		for (i = 0; i < nProd; i++) {
-			p[i] = new Producer(minProd, maxProd, prodTime, prodTimeVariation, buffer);
-		}
+		ProdConsBuffer buffer;
+		Producer[] p;
+		Consumer[] c;
 
-		Consumer[] c = new Consumer[nCons];
-		for (i = 0; i < nCons; i++) {
-			c[i] = new Consumer(consTime, consTimeVariation, buffer);
-		}
-
-		// on les démarre dans un ordre aléatoire
 		Random rand = new Random();
-		int nProdStarted = 0;
-		int nConsStarted = 0;
-		boolean n;
-		long beg = System.currentTimeMillis();
-		while (nProdStarted + nConsStarted < nProd + nCons) {
-			n = rand.nextBoolean();
-			if (nProdStarted < nProd && n) {
-				p[nProdStarted].start();
-				nProdStarted++;
-			} else if (nConsStarted < nCons) {
-				c[nConsStarted].start();
-				nConsStarted++;
-			}
-		}
-		
-		// on attend la fin des consommateurs
-		for (i = 0; i < c.length; i++) {
-			try {
-				c[i].join();
-			} catch (InterruptedException e) {
-			}
-		}
-		
-		long end = System.currentTimeMillis();
-		System.out.println("Efficiency: " + (float)buffer.totmsg()/(end - beg) + " messages per millisecond");
 
+		// on décide si on veut afficher ou non les messages
+		print = false;
+
+		sumEff = 0;
+		maxNbTimes = 5;
+		for (nbTimes = 0; nbTimes < maxNbTimes; nbTimes++) {
+			// on crée le buffer
+			buffer = new ProdConsBuffer(bufSz, nProd);
+
+			// et nos producteur / consommateur
+			p = new Producer[nProd];
+			for (i = 0; i < nProd; i++) {
+				p[i] = new Producer(minProd, maxProd, prodTime, prodTimeVariation, buffer, print);
+			}
+
+			c = new Consumer[nCons];
+			for (i = 0; i < nCons; i++) {
+				c[i] = new Consumer(consTime, consTimeVariation, buffer, print);
+			}
+
+			// on les démarre dans un ordre aléatoire
+			nProdStarted = 0;
+			nConsStarted = 0;
+			beg = System.currentTimeMillis();
+			while (nProdStarted + nConsStarted < nProd + nCons) {
+				n = rand.nextBoolean();
+				if (nProdStarted < nProd && n) {
+					p[nProdStarted].start();
+					nProdStarted++;
+				} else if (nConsStarted < nCons) {
+					c[nConsStarted].start();
+					nConsStarted++;
+				}
+			}
+
+			// on attend la fin des consommateurs
+			for (i = 0; i < c.length; i++) {
+				try {
+					c[i].join();
+				} catch (InterruptedException e) {
+				}
+			}
+
+			end = System.currentTimeMillis();
+			eff = (float) buffer.totmsg() / (end - beg);
+			sumEff += eff;
+			System.out.println("Efficiency: " + eff + " messages per millisecond");
+		}
+		System.out.println("Average Efficiency: " + (float) sumEff/maxNbTimes  + " messages per millisecond");
 	}
 
 }

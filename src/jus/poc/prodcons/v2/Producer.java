@@ -3,6 +3,8 @@ package jus.poc.prodcons.v2;
 import java.util.Random;
 
 public class Producer extends Thread {
+	boolean print;
+	
 	int nbMessage = 0;
 	int nbMessageMin, nbMessageMax, prodTime, prodTimeVariation;
 
@@ -12,13 +14,14 @@ public class Producer extends Thread {
 
 	Random rand = new Random();
 
-	public Producer(int nbMessageMin, int nbMessageMax, int prodTime, int prodTimeVariation, ProdConsBuffer buf) {
+	public Producer(int nbMessageMin, int nbMessageMax, int prodTime, int prodTimeVariation, ProdConsBuffer buf, boolean print) {
 		this.nbMessageMin = nbMessageMin;
 		this.nbMessageMax = nbMessageMax;
 		this.prodTime = prodTime;
 		this.prodTimeVariation = prodTimeVariation;
 		id = getId();
 		buffer = buf;
+		this.print = print;
 	}
 
 	public void prod(String s) {
@@ -44,13 +47,14 @@ public class Producer extends Thread {
 	}
 
 	public void run() {
-		System.out.println("Producer thread " + id + " started");
+		if (print)
+			System.out.println("Producer thread " + id + " started");
 		int nbMes = rand.nextInt(nbMessageMax - nbMessageMin + 1) + nbMessageMin;
 		int i;
 		for (i = 0; i < nbMes; i++) {
 			prod("Producer thread " + id + ": message nb " + (nbMessage + 1));
 		}
-		
+
 		buffer.mutexIn.acquireUninterruptibly();
 		buffer.nbProd--;
 		if (buffer.nbProd == 0) {

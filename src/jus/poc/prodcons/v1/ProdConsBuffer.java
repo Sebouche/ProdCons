@@ -44,11 +44,12 @@ public class ProdConsBuffer implements IProdConsBuffer {
 			}
 			// si la production est terminée, on envoie le message de fin
 			if (nbProd == 0 && nbMes == 0) {
-				return new Message("End");
+				m = new Message("End");
+			} else {
+				m = Buffer[index_cons % buffer_size];
+				index_cons++;
+				nbMes--;
 			}
-			m = Buffer[index_cons % buffer_size];
-			index_cons++;
-			nbMes--;
 			notifyAll();
 		}
 		return m;
