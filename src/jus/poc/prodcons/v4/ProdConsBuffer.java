@@ -37,18 +37,31 @@ public class ProdConsBuffer implements IProdConsBuffer {
 		mutexIn.acquire();
 		Buffer[index_prod % buffer_size] = m;
 		index_prod++;
-		if (m instanceof SyncMessage) {
-			nbMes += ((SyncMessage) m).n();
-			totmsg += ((SyncMessage) m).n();
-			mutexIn.release();
-			notEmpty.release(((SyncMessage) m).n());
-			((SyncMessage) m).waiting();
-		} else {
-			nbMes++;
-			totmsg ++;
-			mutexIn.release();
-			notEmpty.release();
-		}
+		nbMes++;
+		totmsg++;
+		mutexIn.release();
+
+		notEmpty.release();
+
+	}
+
+	@Override
+	public void put(SyncMessage m) throws InterruptedException {
+		// on vérifie si le buffer est plein
+		notFull.acquire();
+
+		// traitement exclusif du buffer
+		mutexIn.acquire();
+		Buffer[index_prod % buffer_size] = m;
+		index_prod++;
+		nbMes += ((SyncMessage) m).n();
+		totmsg += ((SyncMessage) m).n();
+		mutexIn.release();
+		
+		notEmpty.release(((SyncMessage) m).n());
+		
+		((SyncMessage) m).waiting();
+
 	}
 
 	@Override

@@ -18,26 +18,9 @@ public class TestProdCons {
 		int nCons = Integer.parseInt(properties.getProperty("nCons"));
 		int bufSz = Integer.parseInt(properties.getProperty("bufSz"));
 		int prodTime = Integer.parseInt(properties.getProperty("prodTime"));
-		int prodTimeVariation = Integer.parseInt(properties.getProperty("prodTimeVariation"));
 		int consTime = Integer.parseInt(properties.getProperty("consTime"));
-		int consTimeVariation = Integer.parseInt(properties.getProperty("consTimeVariation"));
 		int minProd = Integer.parseInt(properties.getProperty("minProd"));
 		int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
-
-		if (prodTime < prodTimeVariation) {
-			System.out.println("prodTimeVariation too great");
-			prodTimeVariation = prodTime / 2;
-		}
-		if (prodTimeVariation <= 0) {
-			prodTimeVariation = 1;
-		}
-		if (consTime < consTimeVariation) {
-			System.out.println("consTimeVariation too great");
-			consTimeVariation = consTime / 2;
-		}
-		if (consTimeVariation <= 0) {
-			consTimeVariation = 1;
-		}
 
 		boolean print, n;
 		int nbTimes, maxNbTimes, i, nProdStarted, nConsStarted;
@@ -63,12 +46,12 @@ public class TestProdCons {
 			// et nos producteur / consommateur
 			p = new Producer[nProd];
 			for (i = 0; i < nProd; i++) {
-				p[i] = new Producer(minProd, maxProd, prodTime, prodTimeVariation, buffer, print);
+				p[i] = new Producer(minProd, maxProd, prodTime, buffer, print);
 			}
 
 			c = new Consumer[nCons];
 			for (i = 0; i < nCons; i++) {
-				c[i] = new Consumer(consTime, consTimeVariation, buffer, print);
+				c[i] = new Consumer(consTime, buffer, print);
 			}
 
 			// on les démarre dans un ordre aléatoire

@@ -5,9 +5,7 @@
     <entry key="nCons">20</entry>
     <entry key="bufSz">100</entry>
     <entry key="prodTime">10</entry>
-    <entry key="prodTimeVariation">0</entry>
     <entry key="consTime">10</entry>
-    <entry key="consTimeVariation">0</entry>
     <entry key="minProd">100</entry>
     <entry key="maxProd">100</entry>
 </properties>

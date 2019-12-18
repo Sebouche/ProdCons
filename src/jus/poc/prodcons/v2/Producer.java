@@ -6,7 +6,7 @@ public class Producer extends Thread {
 	boolean print;
 	
 	int nbMessage = 0;
-	int nbMessageMin, nbMessageMax, prodTime, prodTimeVariation;
+	int nbMessageMin, nbMessageMax, prodTime;
 
 	long id;
 
@@ -14,11 +14,10 @@ public class Producer extends Thread {
 
 	Random rand = new Random();
 
-	public Producer(int nbMessageMin, int nbMessageMax, int prodTime, int prodTimeVariation, ProdConsBuffer buf, boolean print) {
+	public Producer(int nbMessageMin, int nbMessageMax, int prodTime, ProdConsBuffer buf, boolean print) {
 		this.nbMessageMin = nbMessageMin;
 		this.nbMessageMax = nbMessageMax;
 		this.prodTime = prodTime;
-		this.prodTimeVariation = prodTimeVariation;
 		id = getId();
 		buffer = buf;
 		this.print = print;
@@ -27,16 +26,8 @@ public class Producer extends Thread {
 	public void prod(String s) {
 		nbMessage++;
 
-		// on crée un temps de production aléatoire de moyenne prodTime et compris entre
-		// prodTime - prodTimeVariation et prodTime + prodTimeVariation
-		int diff;
-		if (rand.nextBoolean()) {
-			diff = (-rand.nextInt(prodTimeVariation));
-		} else {
-			diff = rand.nextInt(prodTimeVariation);
-		}
 		long beginProd = System.currentTimeMillis();
-		while (beginProd > System.currentTimeMillis() - prodTime + diff)
+		while (beginProd > System.currentTimeMillis() - prodTime)
 			;
 
 		try {
