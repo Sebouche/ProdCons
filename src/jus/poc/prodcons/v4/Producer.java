@@ -25,7 +25,7 @@ public class Producer extends Thread {
 		this.print = print;
 	}
 
-	public void prod(String s) {
+	public void prod(String s) throws InterruptedException {
 		nbMessage++;
 
 		// on crée un temps de production aléatoire de moyenne prodTime et compris entre
@@ -42,18 +42,46 @@ public class Producer extends Thread {
 
 		buffer.put(new Message(s));
 	}
+	
+	public void prod(String s, int n) throws InterruptedException {
+		nbMessage += n;
+		
+		// on crée un temps de production aléatoire de moyenne prodTime et compris entre
+		// prodTime - prodTimeVariation et prodTime + prodTimeVariation
+		int diff;
+		if (rand.nextBoolean()) {
+			diff = (-rand.nextInt(prodTimeVariation));
+		} else {
+			diff = rand.nextInt(prodTimeVariation);
+		}
+		long beginProd = System.currentTimeMillis();
+		while (beginProd > System.currentTimeMillis() - prodTime + diff)
+			;
+
+		buffer.put(new SyncMessage(s, n));
+	}
 
 	public void run() {
 		if (print)
 			System.out.println("Producer thread " + id + " started");
 		int nbMes = rand.nextInt(nbMessageMax - nbMessageMin + 1) + nbMessageMin;
-		int i;
-		for (i = 0; i < nbMes; i++) {
-			prod("Producer thread " + id + ": message nb " + (nbMessage + 1));
+		int i, n;
+		
+		n = 5;
+				
+		for (i = 0; i < nbMes; i += n) {
+			try {
+				prod("Producer thread " + id + ": message nb " + (nbMessage + 1), n);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		synchronized (buffer) {
-			buffer.nbProd--;
-			buffer.notifyAll();
+		
+		buffer.mutexIn.acquireUninterruptibly();
+		buffer.nbProd--;
+		if (buffer.nbProd == 0) {
+			buffer.notEmpty.release(buffer.buffer_size);
 		}
+		buffer.mutexIn.release();
 	}
 }

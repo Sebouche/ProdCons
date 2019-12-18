@@ -21,7 +21,7 @@ public class Consumer extends Thread {
 		this.print = print;
 	}
 
-	public Message cons() {
+	public Message cons() throws InterruptedException {
 		// on crée un temps de consommation aléatoire de moyenne consTime et compris
 		// entre
 		// consTime - consTimeVariation et consTime + consTimeVariation
@@ -38,7 +38,7 @@ public class Consumer extends Thread {
 		return buffer.get();
 	}
 
-	public Message[] consn(int n) {
+	public Message[] cons(int n) throws InterruptedException {
 		// on crée un temps de consommation aléatoire de moyenne consTime et compris
 		// entre
 		// consTime - consTimeVariation et consTime + consTimeVariation
@@ -56,18 +56,17 @@ public class Consumer extends Thread {
 	}
 
 	public void run() {
+		String res = "";
 		if (print)
 			System.out.println("Consumer thread " + id + " started");
-		Message[] res;
-		int i, n;
 		while (buffer.nbProd > 0 || buffer.nmsg() > 0) {
-			n = 3;
-			res = consn(n);
-			for (i = 0; i < n; i++) {
-				if (print)
-					System.out.println(" Consumer thread " + id + ": read " + res[i].content());
+			try {
+				res = cons().content();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
 			}
-
+			if (print)
+					System.out.println(" Consumer thread " + id + ": read " + res);
 		}
 	}
 

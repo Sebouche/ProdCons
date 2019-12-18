@@ -51,11 +51,11 @@ public class TestProdCons {
 		Random rand = new Random();
 
 		// on décide si on veut afficher ou non les messages
-		print = false;
+		print = true;
 
 		sumEff = 0;
 		
-		maxNbTimes = 5;
+		maxNbTimes = 1;
 		for (nbTimes = 0; nbTimes < maxNbTimes; nbTimes++) {
 			// on crée le buffer
 			buffer = new ProdConsBuffer(bufSz, nProd);
